@@ -61,3 +61,12 @@ describe('emitReadyIfIdle', () => {
         expect(sendReady).not.toHaveBeenCalled();
     });
 });
+
+
+describe('initial codex prompt', () => {
+    it('does not append the happy title instruction to the first message', async () => {
+        const source = await import('../runCodex');
+        const fileText = source.runCodex.toString();
+        expect(fileText).not.toContain('CHANGE_TITLE_INSTRUCTION');
+    });
+});
