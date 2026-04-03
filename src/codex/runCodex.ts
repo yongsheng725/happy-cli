@@ -21,9 +21,7 @@ import fs from 'node:fs';
 import { startHappyServer } from '@/claude/utils/startHappyServer';
 import { MessageBuffer } from "@/ui/ink/messageBuffer";
 import { CodexDisplay } from "@/ui/ink/CodexDisplay";
-import { trimIdent } from "@/utils/trimIdent";
 import type { CodexSessionConfig } from './types';
-import { CHANGE_TITLE_INSTRUCTION } from '@/gemini/constants';
 import { notifyDaemonSessionStarted } from "@/daemon/controlClient";
 import { registerKillSessionHandler } from "@/claude/registerKillSessionHandler";
 import { delay } from "@/utils/time";
@@ -557,7 +555,6 @@ export async function runCodex(opts: {
             args: ['--url', happyServer.url]
         }
     } as const;
-    let first = true;
 
     try {
         logger.debug('[codex]: client.connect begin');
@@ -663,7 +660,7 @@ export async function runCodex(opts: {
 
                 if (!wasCreated) {
                     const startConfig: CodexSessionConfig = {
-                        prompt: first ? message.message + '\n\n' + CHANGE_TITLE_INSTRUCTION : message.message,
+                        prompt: message.message,
                         sandbox,
                         'approval-policy': approvalPolicy,
                         config: { mcp_servers: mcpServers }
@@ -702,7 +699,6 @@ export async function runCodex(opts: {
                         { signal: abortController.signal }
                     );
                     wasCreated = true;
-                    first = false;
                 } else {
                     const response = await client.continueSession(
                         message.message,
